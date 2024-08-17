@@ -1,0 +1,25 @@
+syntax on
+set number
+set clipboard=unnamedplus
+set tabstop=4
+set shiftwidth=4
+set softtabstop=4
+set expandtab
+
+filetype indent on "different indents for diff languages
+
+set hlsearch "when search, highlight all
+
+:highlight ExtraWhitespace ctermbg=red guibg=red
+:match ExtraWhitespace /\s\+$/ "highlights white space at end
+
+set statusline+=%F "current file path
+
+set statusline+=%= "right align from now on
+set statusline+=[line:%l] "line number
+set statusline+=\  "add space
+set statusline+=[col:%c] "column number
+
+set laststatus=2 "to always display status line
+
+set nofixeol "prevents vim from adding a newline at the end of the file
