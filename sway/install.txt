@@ -69,6 +69,8 @@ hwclock --systohc
 
 # pacman -S vim
 
+# edit /etc/locale.gen
+    - comment out en_US.UTF-8 UTF-8
 # to generate locales
 locale-gen
 
@@ -115,3 +117,36 @@ pacman -S sudo
 EDITOR=VIM visudo
     - comment out wheel line
     - %wheel ALL=(ALL:ALL) ALL
+
+======================================
+restart computer
+
+# check connection
+ping archlinux.org
+
+# use network manager to connect
+nmcli device wifi list
+nmcli device wifi connect <network_name> password <password>
+
+# install sway
+sudo pacman -S sway
+
+# to connect keyboard
+sudo pacman -S polkit
+
+sudo pacman -S alacritty
+
+# create dir and config file
+mkdir -p .config/sway
+cp /etc/sway/config .config/sway
+
+# update config file
+vim .config/sway/config
+    - set $term <terminal_emulator>
+    - set to emulator you want
+
+# start sway
+sway -> enter into command line
+
+read more
+    - https://wiki.archlinux.org/title/Sway
