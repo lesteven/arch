@@ -1,0 +1,6 @@
+Kitty
+    - supports tabs
+    - ctrl + shift + left || right
+        - to move left and right
+    - ctrl + tab
+        - to shift between tabs
