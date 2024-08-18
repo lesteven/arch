@@ -1,0 +1,5 @@
+
+# check available disks
+fdisk -l
+
+fdisk 

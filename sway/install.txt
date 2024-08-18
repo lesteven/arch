@@ -1,0 +1,117 @@
+
+# verify that we're in UEFI mode
+cat /sys/firmware/efi/fw_platform_size
+
+# connect ethernet
+ping archlinux.org
+
+# if no internet, ue iwctl
+iwctl
+    - device list -> to list devices
+    - station wlan0 scan -> to start scaning
+    - station wlan0 get-networks
+    - station wlan0 connect <network_name>
+        - enter password
+    - station wlan0 show -> to show where you're connected
+
+
+# ensure system clock is synchronized
+timedatectl
+
+# check available disks
+fdisk -l
+
+# start partitioning disk
+fdisk /dev/nvme0n1
+    - once inside
+    - press d and enter until all partitions are gone
+    - press g -> creates GPT disklabel
+    - press n -> for new partition
+        - first n -> +1G
+        - second n -> +5G
+        - last n -> enter all the way through
+    - press t -> change partition type
+        - t -> 1 (first partition; boot) for EFI partition
+        - t -> 19 (second parititon; swap) for linux swap
+            - the numbers are the partition types
+    - press w -> to write to disk
+
+# format the disks
+mkfs.ext4 /dev/nvme0n1p3 (root partition_)
+mkswap /dev/nvme0n1p2
+mkfs.fat -F 32 /dev/nvme0n1p1
+
+# mount partitions
+mount /dev/nvme0n1p3 /mnt
+mount --mkdir /dev/nvme0n1p1 /mnt/boot
+swapon /dev/nvme0n1p2
+
+
+# install linux
+pacstrap -K /mnt base linux linux-firmware
+    - if you get an error about installing, then you probably
+        didnt mount your partitions correctly
+        - eg. mounting your swap as your boot
+
+
+# create fstab
+genfstab -U /mnt >> /mnt/etc/fstab
+
+# get inside mount to install packages and set things up
+arch-chroot /mnt
+
+# set time zone
+ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
+
+# for hardware clockGo
+hwclock --systohc
+
+
+# pacman -S vim
+
+# to generate locales
+locale-gen
+
+create /etc/locale.conf
+    - LANG=en_US.UTF-8
+
+create /etc/hostname
+    - arch (as hostname)
+
+edit /etc/hosts
+    127.0.0.1	localhost
+    ::1		localhost
+
+# to set root password
+passwd
+
+# install network manager
+pacman -S networkmanager
+
+# install bootloader
+bootctl install
+
+# add boot loader configs
+vim /boot/loader/loader.conf
+    default arch.conf
+    timeout 4
+    console-mode max
+
+# add arch.conf
+vim /boot/loader/entries/arch.conf
+    title Arch Linux
+    linux /vmlinuz-linux
+    initrd /initramfs-linux.img
+    options root=<uuid> wd
+    - blkid /dev/nvme0n1p3 >> /boot/loader/entries/arch.conf
+
+systemctl enable NetworkManager
+
+
+useradd -m wheel steven
+passwd steven
+
+pacman -S sudo
+EDITOR=VIM visudo
+    - comment out wheel line
+    - %wheel ALL=(ALL:ALL) ALL
