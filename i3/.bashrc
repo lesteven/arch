@@ -25,3 +25,6 @@ NONE='\[\e[00m\]'
 # \W working dir
 # color precedes the thing that it colorizes
 PS1="$GREEN[\u@\h $WHITE\W$GREEN]\$$NONE "
+
+export PATH=$PATH:$HOME/go/bin
+export PATH=$HOME/.local/bin:$PATH
